@@ -1,19 +1,130 @@
-# Nabahan (نبهان) - Saudi Government Procurement AI Agent
+# Nabahan (نبهان)
 
-A Text-to-SQL AI Agent that enables natural language queries on Saudi government procurement data in Arabic, powered by **Vanna AI** and **Groq LLM**.
+**Transforming Raw Data into Intelligent Visual Stories**
 
-## Overview
+An AI-Driven InsightAgent that transforms complex Etimad portal data into clear strategic insights. Using an Agentic SQL approach, it enables decision-makers to perform deep data analysis through simple natural language questions, eliminating the need for technical or programming skills.
 
-Nabahan converts Arabic natural language questions into SQL queries, executes them against a structured database of Saudi government tenders and projects, and returns intelligent insights with visualizations.
+---
+
+## The Problem
+
+**Who is suffering?** Strategic Decision Makers & Procurement Officers in Saudi companies who need to track thousands of daily opportunities on the Etimad platform.
+
+**The Pain:** Information Overload - Managing thousands of new daily tenders manually is slow, exhausting, and leads to missing critical deadlines.
+
+**Current Solution:** Manual Search & Filtering - Spending hours scrolling through the Etimad portal using basic filters.
+
+---
+
+## The Solution
+
+We built an AI-Driven InsightAgent that transforms complex Etimad portal data into clear strategic insights. Using an Agentic SQL approach, it enables decision-makers to perform deep data analysis through simple natural language questions.
 
 ### Key Features
 
-- **Arabic Text-to-SQL** - Vanna AI + Groq LLM converts Arabic questions to SQL automatically
-- **Smart Insights** - AI-generated analysis and recommendations in Arabic
-- **Interactive Dashboard** - 5-page Streamlit app with full RTL Arabic support
-- **Dynamic Visualizations** - Auto-generated charts (bar, pie, line) based on query results
-- **Advanced Filtering** - Filter by region, entity, status, and tender type
-- **Evaluation System** - Metrics and visualization for agent performance
+- **Multi-Agent Orchestration System** - Coordinated AI agents for scope checking, SQL generation, execution, and insight generation
+- **End-to-End Data Pipeline** - Web scraping from Etimad portal, CSV processing, SQLite database, AI agents, Streamlit UI
+- **Arabic-First Insight Engine** - Full RTL support with Arabic natural language understanding
+
+---
+
+## System Architecture
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Etimad     │────▶│  Web         │────▶│  CSV Files   │
+│   Portal     │     │  Scraping    │     │  (Raw Data)  │
+└──────────────┘     └──────────────┘     └──────────────┘
+                                                 │
+                                          Preprocessing
+                                                 │
+                                                 ▼
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Streamlit   │◀────│  AI Agents   │◀────│  SQLite DB   │
+│     UI       │     │  (Groq LLM)  │     │  (40K+ rows) │
+└──────────────┘     └──────────────┘     └──────────────┘
+```
+
+---
+
+## The "Agentic" Logic
+
+### The Brain (Reasoning Engine)
+
+- **Model:** LLaMA-3.3-70B via Groq for high-speed inference
+- **Why Groq?** High speed inference (~1.2s latency), allowing the Brain to process complex Arabic queries and generate SQL in real-time
+
+### Agent Tools (The Skill-Set)
+
+| Tool | Role | Description |
+|------|------|-------------|
+| `is_in_scope()` | The Gatekeeper | Scans for 20+ procurement keywords to filter out-of-scope queries |
+| `generate_sql()` | The Translator | Converts Arabic to SQL with complex JOINs and schema awareness |
+| `execute_sql()` | The Bridge | Safely interfaces with SQLite to fetch raw DataFrames |
+| `generate_insights()` | The Analyst | Processes numbers into Arabic summaries and selects the best Plotly chart |
+
+### Decision Process (Logic Flow)
+
+```
+User Question
+     │
+     ▼
+┌─────────────┐     ┌─────────────────────┐
+│ In Scope?   │─NO─▶│ Return: "Out of     │
+└─────────────┘     │  Scope"             │
+     │ YES          └─────────────────────┘
+     ▼
+┌─────────────┐     ┌─────────────────────┐
+│ Generate SQL│─FAIL▶│ Retry (up to 3x)   │
+└─────────────┘     └─────────────────────┘
+     │ SUCCESS
+     ▼
+┌─────────────┐
+│ Execute SQL │
+└─────────────┘
+     │
+     ▼
+┌─────────────┐
+│ Insights    │──▶ Output: Table + Text + Chart
+│ Agent       │
+└─────────────┘
+```
+
+---
+
+## Evaluation & Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **Retrieval Accuracy** | Did it find the right data? | > 80% |
+| **Generation Fidelity** | Is the answer truthful to the data? | > 80% |
+| **Latency** | Average query response time | < 5s |
+
+```bash
+# Run evaluation
+python evaluation/run_evaluation.py
+
+# Quick test (5 cases)
+python evaluation/run_evaluation.py --quick
+```
+
+---
+
+## Challenges & Solutions
+
+| Challenge | Solution |
+|-----------|----------|
+| **Data Noise** - Scraped data from Etimad was inconsistent, with merged text in location fields | **Data Engineering** - Extensive cleaning on CSV files and standardized region names for 100% query accuracy |
+| **Schema Mapping** - AI must map Arabic queries to English column names | **Self-Correction Logic** - Retry logic with fuzzy search (LIKE %) to handle naming variations and empty results |
+
+---
+
+## Future Work
+
+1. **User Personalization** - Secure logins to save history and provide AI-driven business recommendations
+2. **Real-time Alerts & API Integration** - Live APIs for instant data updates and automated tender notifications
+3. **Data Ecosystem Expansion** - Scaling Nabahan to include diverse procurement data beyond Etimad
+4. **Multi-lingual Support** - Enhancing NLP to support multiple languages for global investors
 
 ---
 
@@ -36,7 +147,7 @@ Final_Project/
 │   ├── run_evaluation.py           # Evaluation pipeline runner
 │   └── test_cases.json             # 20 test cases
 │
-├── Data/                           # Raw and processed data files
+├── Data/                           # Raw and processed data
 │   ├── raw/                        # Original scraped data from Etimad
 │   └── processed/                  # Cleaned data files
 │
@@ -44,47 +155,9 @@ Final_Project/
 │   └── nabahan.db                  # SQLite database (40K+ records)
 │
 ├── presentation/                   # Presentation materials
-│   ├── PRESENTATION_CONTENT.md     # 8-slide presentation content
-│   └── EVALUATION_PIPELINE.md      # Evaluation pipeline docs
-│
 ├── .streamlit/                     # Streamlit configuration
 ├── requirements.txt                # Python dependencies
-├── architecture.md                 # System architecture docs
-└── README.md
-```
-
----
-
-## System Architecture
-
-```
-User Query (Arabic)
-       │
-       ▼
-┌──────────────┐
-│ Scope Check  │ ──▶ Out of scope? Return message
-└──────────────┘
-       │
-       ▼
-┌──────────────┐
-│  Vanna AI +  │ ──▶ Generate SQL
-│  Groq LLM    │     (llama-3.3-70b-versatile)
-└──────────────┘
-       │
-       ▼
-┌──────────────┐
-│   SQLite DB  │ ──▶ Execute query (7 tables, 40K+ records)
-└──────────────┘
-       │
-       ▼
-┌──────────────┐
-│  Groq LLM    │ ──▶ Generate insights + chart recommendation
-└──────────────┘
-       │
-       ▼
-┌──────────────┐
-│ Streamlit UI │ ──▶ Display results, insights, and charts
-└──────────────┘
+└── architecture.md                 # System architecture docs
 ```
 
 ---
@@ -93,80 +166,37 @@ User Query (Arabic)
 
 | Component | Technology |
 |-----------|------------|
-| Text-to-SQL | Vanna AI |
-| LLM | Groq API (llama-3.3-70b-versatile) |
-| Vector Store | ChromaDB |
+| LLM | Groq API (LLaMA-3.3-70B) |
+| Text-to-SQL | Vanna AI + ChromaDB |
 | Database | SQLite |
 | Frontend | Streamlit |
-| Language | Python 3.10+ |
 | Visualization | Plotly, Matplotlib |
-
----
-
-## Database
-
-| Table | Records | Description |
-|-------|---------|-------------|
-| `tenders_full_details` | 2,414 | Government tenders with full details |
-| `future_projects` | 37,764 | Planned future government projects |
-| `government_entity` | 1,681 | Saudi government entities |
-| `regions` | 13 | Administrative regions |
-| `tender_statuses` | 7 | Tender status types |
-| `tender_types` | 13 | Types of tenders |
-| `primary_activity` | 19 | Activity categories |
+| Language | Python 3.10+ |
 
 ---
 
 ## Installation
 
 ```bash
-# Clone
 git clone https://github.com/ReAlangari/Final-Project-Nabahan.git
 cd Final-Project-Nabahan
 
-# Virtual environment
 python -m venv venv
-source venv/bin/activate    # Linux/Mac
 venv\Scripts\activate       # Windows
+source venv/bin/activate    # Linux/Mac
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Configure API key
 # Create .env file with: GROQ_API_KEY=your_key_here
 
-# Run
 streamlit run frontend/app.py
 ```
 
 ---
 
-## Example Queries
+## Conclusion
 
-| Arabic Query | Description |
-|--------------|-------------|
-| كم عدد المناقصات في الرياض؟ | Count of tenders in Riyadh |
-| ما هي الجهات الاكثر طرحا للمنافسات؟ | Top entities by tender count |
-| اعرض المشاريع المستقبلية لعام 2024 | Future projects for 2024 |
-| توزيع المناقصات حسب الحالة | Tender distribution by status |
-
----
-
-## Evaluation Metrics
-
-| Metric | Description | Target |
-|--------|-------------|--------|
-| **Retrieval Accuracy** | Correct table and relevant data retrieved | > 80% |
-| **Generation Fidelity** | Insight is truthful to the data | > 80% |
-| **Latency** | Average query response time | < 5s |
-
-```bash
-# Run evaluation
-python evaluation/run_evaluation.py
-
-# Quick test (5 cases)
-python evaluation/run_evaluation.py --quick
-```
+Nabahan is more than just a search tool; it is an intelligent engine utilizing Agentic AI to convert natural language into complex SQL queries with high precision. We developed this agent to break the "Big Data" barrier, transforming fragmented numbers into immediate strategic insights. With Nabahan, we don't just save time; we create insight in the era of Vision 2030.
 
 ---
 
@@ -177,7 +207,3 @@ python evaluation/run_evaluation.py --quick
 ## License
 
 This project is for educational purposes.
-
----
-
-Built with Vanna AI + Groq LLM + Streamlit
